@@ -1,0 +1,42 @@
+# sweep.yaml
+program: main.py
+method: grid
+project: MuSe2024_HUMOR
+entity: xyz
+metric:
+  name: best_val_score
+  goal: maximize
+parameters:
+  early_stopping_patience:
+    value: 15
+  task:
+    value: humor
+  encoder:
+    values: [ RAMM ]
+  features:
+    values: ['w2v-msp + vit-fer', 'w2v-msp + facenet512', 'w2v-msp + faus', 'ds + vit-fer', 'ds + facenet512', 'ds + faus', 'egemaps + vit-fer', 'egemaps + facenet512', 'egemaps + faus']
+  nhead:
+    values: [2, 4, 8]
+  model_dim:
+    values: [ 64, 128, 256 ]
+  encoder_n_layers:
+    values: [ 2, 4, 6 ]
+  linear_dropout:
+    values: [ 0.2, 0.3, 0.5]
+  lr:
+    values: [ 0.0001, 0.0003, 0.001, 0.003, 0.01 ]
+  regularization:
+    values: [1e-5, 1e-4, 1e-3]
+  seed:
+    value: 42
+  n_seeds:
+    value: 3
+command:
+  - ${env}
+  - python3
+  - ${program}
+  - ${args}
+  - --use_gpu
+  - --cache
+  - --wandb
+  - --device=cuda
