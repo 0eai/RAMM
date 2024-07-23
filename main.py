@@ -104,6 +104,10 @@ def get_eval_fn(task):
     elif task == HUMOR:
         return calc_auc, 'AUC'
 
+def load_model(model, model_file, device='cpu'):
+    model.load_state_dict(torch.load(model_file, map_location=device))
+    model.to(device)
+    return model
 
 def main(args):
     # ensure reproducibility
@@ -145,6 +149,7 @@ def main(args):
                 model = UnimodalModel(args)
             else:
                 model = MultimodalModel(args)
+            print(model)
 
 
             print('=' * 50)
@@ -157,7 +162,8 @@ def main(args):
                                                                regularization=args.regularization,
                                                                early_stopping_patience=args.early_stopping_patience, device=args.device)
             # restore best model encountered during training
-            model = torch.load(best_model_file)
+            # model = torch.load(best_model_file)
+            model = load_model(model, best_model_file, device=args.device)
 
             if not args.predict:  # run evaluation only if test labels are available
                 test_loss, test_score = evaluate(args.task, model, data_loader['test'], loss_fn=loss_fn,
@@ -192,8 +198,8 @@ def main(args):
 
     else:  # Evaluate existing model (No training)
         model_file = os.path.join(args.paths['model'], f'model_{args.eval_seed}.pth')
-        model = torch.load(model_file, map_location=torch.device(args.device) if torch.cuda.is_available()
-        else torch.device('cpu'))
+        model = torch.load(model_file, map_location=torch.device(args.device) if torch.cuda.is_available() else torch.device('cpu'))
+        # model = load_model(model, model_file, device=args.device) # TODO
         data_loader = {}
         for partition, dataset in datasets.items():  # one DataLoader for each partition
             batch_size = args.batch_size if partition == 'train' else 2 * args.batch_size

@@ -95,13 +95,19 @@ class ResidualEncoderBlock(nn.Module):
         if self.multimodal:
             inter_ma_output = self.inter_ma(modalities)
             inter_ma_output = self.norm1(inter_ma_output)
+            
+            # Split inter_ma_output back into individual modality shapes
+            split_size = modalities[0].size(0)
+            inter_ma_outputs = inter_ma_output.split(split_size, dim=0)
         else:
-            inter_ma_output = modalities[0]  # For unimodal, just use the single modality directly
+            inter_ma_outputs = modalities
+
+        # Intra-Modality Attention
+        intra_ma_outputs = [self.intra_ma(inter_modality_output) for inter_modality_output in inter_ma_outputs]
+        intra_ma_outputs = [self.norm2(output) + self.residual(modality) for output, modality in zip(intra_ma_outputs, modalities)]
         
-        intra_ma_outputs = [self.intra_ma(modality) for modality in modalities]
-        intra_ma_outputs = [self.norm2(output) + modality for output, modality in zip(intra_ma_outputs, modalities)]
-        
-        ffn_outputs = [self.ffn(output) + output for output in intra_ma_outputs]
+        # Feed-Forward Network
+        ffn_outputs = [self.ffn(output) + self.residual(output) for output in intra_ma_outputs]
         return ffn_outputs
 
 class OutModule(nn.Module):
