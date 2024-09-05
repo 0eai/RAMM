@@ -3,7 +3,6 @@ from torch.utils.data.dataloader import default_collate
 from torch.utils.data.dataset import Dataset
 import numpy as np
 
-
 class MuSeDataset(Dataset):
     def __init__(self, data, partition):
         super(MuSeDataset, self).__init__()

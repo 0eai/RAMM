@@ -8,6 +8,7 @@ import numpy
 import torch
 from dateutil import tz
 from torch import nn
+import torch.nn.functional as F
 
 import config
 from config import TASKS, PERCEPTION, HUMOR, ENCODERS
@@ -89,7 +90,6 @@ def parse_args():
     if args.eval_model:
         assert args.eval_seed
     return args
-
 
 def get_loss_fn(task):
     if task == HUMOR:
@@ -244,7 +244,7 @@ if __name__ == '__main__':
             if hasattr(args, key):
                 setattr(args, key, value)
                 
-    print('type(args.features):', type(args.features))
+    # print('type(args.features):', type(args.features))
     print('args.features:', args.features)
     
     if type(list()) == type(args.features):
@@ -256,7 +256,7 @@ if __name__ == '__main__':
         else:
             args.features = [args.features]
             
-    print('type(args.features):', type(args.features))
+    # print('type(args.features):', type(args.features))
     print('args.features:', args.features)
     
     feature_str = "_".join([feature.replace(os.path.sep, "-") for feature in args.features])
@@ -265,9 +265,9 @@ if __name__ == '__main__':
     print(args.log_file_name)
     
     if args.wandb:
-        ## change the name of this run
+        # change the name of this run
         wandb.run.name = args.log_file_name 
-        wandb.run.save()
+        # wandb.run.save()
     
     # args.log_file_name =  '{}_{}_[{}]_[{}_{}_{}_{}]_[{}_{}]'.format('RNN', datetime.now(tz=tz.gettz()).strftime("%Y-%m-%d-%H-%M"), args.feature.replace(os.path.sep, "-"),
     #                                              args.model_dim, args.rnn_n_layers, args.rnn_bi, args.d_fc_out, args.lr,args.batch_size)

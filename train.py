@@ -50,7 +50,7 @@ def train_model(task, model, data_loader, epochs, lr, model_path, identifier, us
     train_loader, val_loader, test_loader = data_loader['train'], data_loader['devel'], data_loader['test']
 
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=regularization)
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=10)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10, min_lr=1e-5, verbose=True)
 
     best_val_loss = float('inf')
     best_val_score = -1
